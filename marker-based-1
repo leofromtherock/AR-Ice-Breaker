@@ -1,29 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
     <head>
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <meta charset="utf-8" name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
         <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     </head>
 
     <body style="margin: 0px; overflow: hidden;">
-        <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+        <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
 
             <a-assets>
                 <a-asset-item id="d20" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/dice_20/scene.gltf"></a-asset-item>
             </a-assets>
 
-            <a-marker preset="hiro">
+            <a-marker id="d20-marker" type="barcode" value="1" smooth="true" emitevents="true">
                 <a-entity
-                gltf-model="#d20">
-            </a-marker>
-
-            <a-marker id="d20-marker" type="barcode" value="1">#
-                <a-entity
-                gltf-model="#d20">
+                gltf-model="#d20"
+                scale="10 10 10"
+                position="0 0 2">
+                </a-entity>
             </a-marker>
             
         <a-entity camera></a-entity>
-        </a-scene>" 
+        </a-scene>
+        
+        <div class="button">
+            <button class="roll-dice-button">Würfeln</button>
+        </div>
+        
+        <style>
+            .button {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 5em;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10;
+            }
+            
+            .roll-dice-button {
+                padding: 0.25em;
+                border-radius: 4px;
+                border: none;
+                background: white;
+                color: black;
+                width: 6rem;
+                height: 4rem;
+                font-family:'Times New Roman', Times, serif;
+            }
+        </style>
+        
+        <script>
+        window.onload = function() {
+            document
+                .querySelector('.roll-dice-button')
+                .addEventListener('click', function() {
+                const d20 = document.querySelector('#d20');
+                d20.setAttribute('animation', {
+                    property: 'rotation',
+                    to: '0 360 0',
+                    dur: 1000,
+                    easing: 'linear'
+                });
+                });
+            };
+        </script>
+    
     </body>
 </html>

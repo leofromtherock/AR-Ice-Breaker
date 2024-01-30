@@ -1,23 +1,36 @@
 <!DOCTYPE html>
 <html lang="de">
     <head>
-        <meta charset="utf-8" name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
         <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+        <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
     </head>
 
     <body style="margin: 0px; overflow: hidden;">
-        <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+        <a-scene 
+            embedded 
+            arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+            renderer="logarithmicDepthBuffer: true;"
+            vr-mode-ui="enabled: false"
+            gesture-detector
+            id="scene">
 
             <a-assets>
-                <a-asset-item id="d20" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/dice_20/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-a" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/dice_20/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-b" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/cat_plushie/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-c" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/fox_plushie/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-d" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/plushie_shark/scene.gltf"></a-asset-item>
             </a-assets>
 
-            <a-marker id="d20-marker" type="barcode" value="1" smooth="true" emitevents="true">
+            <a-marker id="random-object" type="barcode" value="1" smooth="true" emitevents="true">
                 <a-entity
-                gltf-model="#d20"
-                scale="10 10 10"
-                position="0 0 2">
+                gltf-model="#random"
+                scale="2 2 2"
+                position="0 0 1"
+                class="clickable"
+                gesture-handler="minScale: 0.25; maxScale: 10">
                 </a-entity>
             </a-marker>
             
@@ -25,49 +38,200 @@
         </a-scene>
         
         <div class="button">
-            <button class="roll-dice-button">Würfeln</button>
+            <button class="randomize-object-button"></button>
+            <!--x <button class="screenshot-button">Foto</button> -->
         </div>
-        
+        <div id="spinner" class="spinner"></div>
+
         <style>
             .button {
                 position: absolute;
                 bottom: 0;
                 left: 0;
                 width: 100%;
-                height: 5em;
+                height: 10em; /* Increase the height to accommodate both buttons */
                 display: flex;
+                flex-direction: column; /* Arrange children in a column */
                 justify-content: center;
                 align-items: center;
                 z-index: 10;
             }
-            
-            .roll-dice-button {
-                padding: 0.25em;
-                border-radius: 4px;
+
+            .randomize-object-button, .screenshot-button {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
                 border: none;
-                background: white;
-                color: black;
-                width: 6rem;
-                height: 4rem;
-                font-family:'Times New Roman', Times, serif;
+                background: rgba(255, 255, 255, 0.25) url('https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/reload.svg') no-repeat center center;
+                background-size: 60%;
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.5), /* Red Glow */
+                            0 0 30px rgba(0, 255, 0, 0.5), /* Green Glow */
+                            0 0 40px rgba(0, 0, 255, 0.5); /* Blue Glow */
+                backdrop-filter: blur(10.2px);
+                -webkit-backdrop-filter: blur(10.2px);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+            }
+
+            .spinner {
+                border: 16px solid #f3f3f3;
+                border-top: 16px solid #3498db;
+                border-radius: 50%;
+                width: 120px;
+                height: 120px;
+                animation: spin 2s linear infinite;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+                z-index: 20; /* Ensure it's above other elements */
+                display: none; /* Initially hidden */
+            }
+
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
             }
         </style>
         
         <script>
-        window.onload = function() {
-            document
-                .querySelector('.roll-dice-button')
-                .addEventListener('click', function() {
-                const d20 = document.querySelector('#d20');
-                d20.setAttribute('animation', {
-                    property: 'rotation',
-                    to: '0 360 0',
-                    dur: 1000,
-                    easing: 'linear'
+            document.addEventListener('DOMContentLoaded', function () {
+                var assets = document.querySelector('a-assets');
+                var randomizeButton = document.querySelector('.randomize-object-button');
+                var entity = document.querySelector('a-entity');
+                var models = ['object-a', 'object-b', 'object-c', 'object-d']; // List of models
+                var startTime = Date.now(); // Start time for spinner display
+                
+                // Get the scene and check for marker visibility
+                var sceneEl = document.querySelector('#scene');
+                var isMarkerVisible = false;
+
+                sceneEl.addEventListener("markerFound", (e) => {
+                    isMarkerVisible = true;
                 });
+
+                sceneEl.addEventListener("markerLost", (e) => {
+                    isMarkerVisible = false;
                 });
-            };
+
+                // Initialize scaleFactor, initialScale, and rotationFactor for Gesture Handling
+                var scaleFactor = 1;
+                var initialScale = {x: 1, y: 1, z: 1}; 
+                var rotationFactor = 0.1; 
+                
+                // Gesture handler
+                sceneEl.addEventListener("onefingermove", handleRotation);
+                sceneEl.addEventListener("twofingermove", handleScale);
+                
+                // One finger rotation
+                function handleRotation(event) {
+                    if (isMarkerVisible) {
+                        entity.object3D.rotation.y +=
+                        event.detail.positionChange.x * rotationFactor;
+
+                        entity.object3D.rotation.x +=
+                        event.detail.positionChange.y * rotationFactor;
+                     }
+                }
+
+                // Two finger scaling
+                function handleScale(event) {
+                    if (isMarkerVisible) {
+                        scaleFactor *= 1 + event.detail.spreadChange / event.detail.startSpread;
+
+                        // Use the minScale and maxScale values from the gesture-handler component
+                        var minScale = entity.getAttribute('gesture-handler').minScale;
+                        var maxScale = entity.getAttribute('gesture-handler').maxScale;
+
+                        scaleFactor = Math.min(Math.max(scaleFactor, minScale), maxScale);
+
+                        entity.object3D.scale.x = scaleFactor * initialScale.x;
+                        entity.object3D.scale.y = scaleFactor * initialScale.y;
+                        entity.object3D.scale.z = scaleFactor * initialScale.z;
+                    }
+                }
+
+                // Function to randomize the model
+                function randomizeModel() {
+                    console.log("Before change:", entity.getAttribute('gltf-model'));
+
+                    var currentModel = entity.getAttribute('gltf-model');
+                    var randomModel;
+                    var modelUrl;
+
+                    // Hide the assets
+                    entity.object3D.visible = false;
+
+                    // Show the spinner
+                    document.getElementById('spinner').style.display = 'block';
+
+                    // Keep selecting a new model until it's different from the current one
+                    do {
+                        randomModel = models[Math.floor(Math.random() * models.length)];
+                        modelUrl = document.querySelector('#' + randomModel).getAttribute('src');
+                    } while (modelUrl === currentModel);
+
+                    // Update the start time
+                    startTime = Date.now();
+
+                    entity.setAttribute('gltf-model', modelUrl);
+
+                    console.log("After change:", entity.getAttribute('gltf-model'));
+                }
+
+                    // Event listener for when the model is loaded
+                    entity.addEventListener('model-loaded', function () {
+                    var elapsedTime = Date.now() - startTime;
+                    var remainingTime = Math.max(0, 1000 - elapsedTime); // 1000 ms is your minimum spinner display time
+                        console.log('Remaining time:', remainingTime);
+
+                    if (remainingTime > 0) {
+                        // If the minimum time hasn't passed, wait the remaining time
+                        setTimeout(function() {
+                            // Hide the spinner
+                            document.getElementById('spinner').style.display = 'none';
+                            // Show the asset
+                            entity.object3D.visible = true;
+                        }, remainingTime);
+                    } else {
+                        // If the minimum time has passed, hide the spinner immediately
+                        document.getElementById('spinner').style.display = 'none';
+                        entity.object3D.visible = true;
+                    }
+                });
+
+                // Event listener for when all assets are loaded
+                assets.addEventListener('loaded', function () {
+                    console.log('All assets are loaded');
+
+                    // Randomize model on page load
+                    randomizeModel();
+
+                    // Make the button visible
+                    // randomizeButton.style.display = 'block';
+                });
+
+                // Randomize on button click
+                randomizeButton.addEventListener('click', randomizeModel);
+
+                // Take a screenshot on button click
+                // var screenshotButton = document.querySelector('.screenshot-button');
+
+                // screenshotButton.addEventListener('click', function() {
+                    // var canvas = sceneEl.canvas; // Get the A-Frame canvas from the scene
+                    // var image = canvas.toDataURL('image/png');
+                    
+                    // var link = document.createElement('a');
+                    // link.download = 'my-ar-screenshot.png';
+                    // link.href = image;
+                    // link.click();
+                // });
+            });
         </script>
-    
     </body>
 </html>

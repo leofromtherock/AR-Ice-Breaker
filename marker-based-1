@@ -22,18 +22,25 @@
 
             <!-- Assets für die Szene (3D-Modelle) -->
             <a-assets>
-                <a-asset-item id="object-a" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/dice_20/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-b" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/cat_plushie/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-c" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/fox_plushie/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-d" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/plushie_shark/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-1" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/1/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-2" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/2/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-3" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/3/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-4" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/4/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-5" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/5/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-6" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/6/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-7" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/7/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-8" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/8/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-9" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/9/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-10" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/10/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-11" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/11/scene.gltf"></a-asset-item>
+                <a-asset-item id="object-12" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/12/scene.gltf"></a-asset-item>
             </a-assets>
 
             <!-- Marker, der das 3D-Modell anzeigt -->
             <a-marker id="random-object" type="barcode" value="1" smooth="true" emitevents="true">
                 <a-entity
                 gltf-model="#random"
-                scale="2 2 2"
-                position="0 0 1"
+                position="0 0 0"
                 class="clickable"
                 gesture-handler="minScale: 0.25; maxScale: 10">
                 </a-entity>
@@ -45,6 +52,44 @@
         
         <!-- UI-Elemente -->
         <div class="ui-frame"></div>
+
+        <!-- Info-Button und Popup -->
+        <div class="info" onclick="openInfoPopup(event)"></div>
+
+        <div class="info-popup" id="infoPopup">
+            <div style="padding-top: 10px;">
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/qr_code.png">
+                <div>
+                    <h1>Code scannen</h1>
+                    <p>Den QR Code (erneut) scannen, um die AR-Inhalte zu entdecken.</p>
+                </div>
+            </div>
+            <div>
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/one_finger.png">
+                <div>
+                    <h1>Drehen</h1>
+                    <p>Mit einem Finger kann das Modell in alle Richtungen gedreht werden.</p>
+                </div>
+            </div>
+            <div>
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/two_fingers.png">
+                <div>
+                    <h1>Skalieren</h1>
+                    <p>Mit zwei Fingern kann das Modell größer oder kleiner gezogen werden.</p>
+                </div>
+            </div>
+            <div>
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/reload.png">
+                <div>
+                    <h1>Modell wechseln</h1>
+                    <p>Mit dem Reload-Button kann ein zufällig neues Modell angezeigt werden.</p>
+                </div>
+            </div>
+            <div class="close-icon" onclick="closeInfoPopup()">&#x2715;</div>
+        </div>
+
+        <!-- Nachricht, die angezeigt wird, wenn der Marker nicht sichtbar ist -->
+        <p class="marker-lost-message">Bitte Marker scannen</p> 
 
         <div class="button">
             <!-- Button zum Zufälligen Ändern des 3D-Modells -->
@@ -74,7 +119,120 @@
                     inset -5px -5px 5px rgba(224, 190, 54, 0.5),
                     inset 0 0 10px rgba(255, 255, 255, 0.75);
             }
+
+            /* Info-Button und Pop-Up */
+            .info {
+                position: absolute;
+                content: '';
+                top: 20px;
+                left: 20px;
+                font-family: 'Gill Sans', sans-serif;
+                text-align: center;
+                align-items: center;
+                font-weight: bold;
+                color: #E9724C;
+                border: 3px solid #E9724C;
+                border-radius: 50%;
+                width: 20px; 
+                height: 20px; 
+                line-height: 20px; 
+                cursor: pointer;
+                font-size: 15px;
+                z-index: 10;
+                transition: all 0.5s ease;
+            }
+
+            .info::after {
+                content: 'i'; 
+            }
+
+            .info-expanded {
+                background-color:#E9724C; 
+                color: #E0BE36; 
+                border-radius: 50px; 
+                padding: 0px 15px; 
+                width: auto; 
+                content: 'info'; 
+                transition: all 0.5s ease; 
+            }
+
+            .info-expanded::after {
+                content: 'info';
+            }
+
+            .info-popup {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 75vw;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 15;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+            }
             
+            .info-popup img {
+                width: 75px;
+                height: 75px;
+            }
+
+            .info-popup h1 {
+                font-family: 'Gill Sans', sans-serif;
+                color: #E9724C; 
+                font-weight: bold;
+                font-size: 15px;
+            }
+
+            .info-popup p {
+                font-family: 'Gill Sans', sans-serif;
+                color: #000000; 
+                font-weight: normal;
+                font-size: 15px;
+            }
+
+            .info-popup > div {
+                display: flex;
+                align-items: center;
+            }
+
+            .info-popup > div > img {
+                margin-right: 10px;
+            }
+
+            .close-icon {
+                position: absolute;
+                top: 7px;
+                right: 7px;
+                color: black;
+                text-align: center;
+                line-height: 0.8;
+                cursor: pointer;
+                font-size: 15px;
+            }
+
+            /* Nachricht, die angezeigt wird, wenn der Marker nicht sichtbar ist */
+            .marker-lost-message {
+                pointer-events: none;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                font-family: 'Gill Sans', sans-serif;
+                text-align: center;
+                font-size: 2em;
+                color: rgba(233, 114, 76);
+                text-shadow: 0 0 10px rgba(224, 190, 54, 0.5);
+                z-index: 10;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+            }
+
             /* Container für den Button, am unteren Rand des Bildschirms positioniert */
             .button {
                 position: absolute;
@@ -86,13 +244,12 @@
                 flex-direction: column; 
                 justify-content: center;
                 align-items: center;
-                z-index: 10;
+                z-index: 14;
             }
 
             /* Button zum Zufälligen Ändern des 3D-Modells */
             .randomize-object-button {
                 position: relative;
-                display: flex;
                 justify-content: center;
                 align-items: center;
                 width: 100px;
@@ -108,16 +265,12 @@
                     -10px 0 20px rgba(233, 114, 76, 0.75), 
                     10px 0 20px rgba(224, 190, 54, 0.75);  
                 margin-bottom: 40px;
+                transition: opacity 0.5s ease-in-out;
+                opacity: 0;
             }
 
-            /* Spinner für Ladeanzeige */
+            /* Loading Spinner und Animation */
             .spinner {
-                border: 16px solid #E9724C;
-                border-top: 16px solid #E0BE36;
-                border-radius: 50%;
-                width: 100px;
-                height: 100px;
-                animation: spin 2s linear infinite;
                 position: fixed;
                 top: 0;
                 bottom: 0;
@@ -126,30 +279,75 @@
                 margin: auto;
                 z-index: 20; 
                 display: none; 
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                animation: pulse 1s infinite alternate;
             }
 
-            /* Animation für den Spinner */
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
+            @keyframes pulse {
+                0% {
+                    transform: scale(0.25);
+                    background-color: #E0BE36;
+                }
+                100% {
+                    transform: scale(2);
+                    background-color: rgba(233, 114, 76, 0.5);
+                    backdrop-filter: blur(10.2px);
+                    -webkit-backdrop-filter: blur(10.2px);
+                    border: 0.5px solid rgba(255, 255, 255, 0.15);
+                    box-shadow: 
+                        0 0 10px rgba(255, 255, 255, 0.75), 
+                        -10px 0 20px rgba(233, 114, 76, 0.75), 
+                        10px 0 20px rgba(224, 190, 54, 0.75);
+                }
             }
         </style>
         
         <script>
-            // Warten Sie, bis das Dokument vollständig geladen ist
+            // Warten, bis das Dokument vollständig geladen ist
             document.addEventListener('DOMContentLoaded', function () {
                 // Referenzen auf HTML-Elemente und Initialisierung von Variablen
                 var assets = document.querySelector('a-assets');
                 var randomizeButton = document.querySelector('.randomize-object-button');
                 var entity = document.querySelector('a-entity');
-                var models = ['object-a', 'object-b', 'object-c', 'object-d']; // Liste der Modelle
+                var models = ['object-1', 'object-2', 'object-3', 'object-4', 'object-5', 'object-6', 
+                            'object-7', 'object-8', 'object-9', 'object-10', 'object-11', 'object-12']; // Liste der Modelle
                 var startTime = Date.now(); // Startzeit für die Anzeige des Spinners
                 var sceneEl = document.querySelector('#scene'); // Szene-Element
                 var isMarkerVisible = false; // Marker-Sichtbarkeitsstatus
 
-                // Event-Listener für Marker-Events
-                sceneEl.addEventListener("markerFound", (e) => { isMarkerVisible = true; });
-                sceneEl.addEventListener("markerLost", (e) => { isMarkerVisible = false; });
+                // Deaktiviere den Button zunächst
+                var randomizeButton = document.querySelector('.randomize-object-button');
+                randomizeButton.style.display = 'none';
+                
+                // Event-Listener für das "markerFound"-Event
+                sceneEl.addEventListener("markerFound", (e) => {
+                    // Setze die Variable isMarkerVisible auf true, wenn der Marker gefunden wird
+                    isMarkerVisible = true;
+                    // Setze die CSS-Eigenschaft 'display' des Buttons auf 'flex', um ihn sichtbar zu machen
+                    randomizeButton.style.display = 'flex';
+                    // Füge eine kurze Verzögerung hinzu, um sicherzustellen, dass der Button sichtbar ist, bevor die Opazität geändert wird
+                    setTimeout(() => randomizeButton.style.opacity = '1', 50);
+                    // Setze die CSS-Eigenschaft 'opacity' der Nachricht auf '0', um sie zu verbergen
+                    document.querySelector('.marker-lost-message').style.opacity = '0';
+                    // Normale Info-Button-Optik wiederherstellen
+                    document.querySelector('.info').classList.remove('info-expanded');
+                });
+
+                // Event-Listener für das "markerLost"-Event
+                sceneEl.addEventListener("markerLost", (e) => {
+                    // Setze die Variable isMarkerVisible auf false, wenn der Marker verloren geht
+                    isMarkerVisible = false;
+                    // Ändere die Opazität des Buttons auf 0, um die Überblendung zu starten
+                    randomizeButton.style.opacity = '0';
+                    // Warte bis die Überblendung abgeschlossen ist, bevor du den Button unsichtbar machst
+                    setTimeout(() => randomizeButton.style.display = 'none', 500);
+                    // Setze die CSS-Eigenschaft 'opacity' der Nachricht auf '1', um sie anzuzeigen
+                    document.querySelector('.marker-lost-message').style.opacity = '1';
+                    // Info-Button-Optik ändern
+                    document.querySelector('.info').classList.add('info-expanded');
+                });
 
                 // Initialisierung von Skalierungs- und Rotationsfaktoren für die Gestensteuerung
                 var scaleFactor = 1;
@@ -160,7 +358,7 @@
                 sceneEl.addEventListener("onefingermove", handleRotation);
                 sceneEl.addEventListener("twofingermove", handleScale);
 
-                // Funktion zur Handhabung der Rotation
+                // Funktion zur Handhabung der Rotation (Gestensteuerung)
                 function handleRotation(event) {
                     if (isMarkerVisible) {
                         entity.object3D.rotation.y += event.detail.positionChange.x * rotationFactor;
@@ -168,7 +366,7 @@
                     }
                 }
 
-                // Funktion zur Handhabung der Skalierung
+                // Funktion zur Handhabung der Skalierung (Gesturesteuerung)
                 function handleScale(event) {
                     if (isMarkerVisible) {
                         scaleFactor *= 1 + event.detail.spreadChange / event.detail.startSpread;
@@ -186,9 +384,10 @@
                     var currentModel = entity.getAttribute('gltf-model');
                     var randomModel, modelUrl;
 
-                    // Verstecke das Modell und zeige den Spinner
+                    // Verstecke das Modell und den Button und zeige den Spinner
                     entity.object3D.visible = false;
                     document.getElementById('spinner').style.display = 'block';
+                    randomizeButton.style.opacity = '0';
 
                     // Wähle ein zufälliges Modell, das nicht das aktuelle Modell ist
                     do {
@@ -201,32 +400,68 @@
                     entity.setAttribute('gltf-model', modelUrl);
                 }
 
+                var isButtonClicked = false;
+
                 // Event-Listener für das Laden des Modells
                 entity.addEventListener('model-loaded', function () {
                     var elapsedTime = Date.now() - startTime;
-                    var remainingTime = Math.max(0, 1000 - elapsedTime); // Mindestens 1000 ms Spinner-Anzeigezeit
+                    var remainingTime = Math.max(0, 2000 - elapsedTime); // Mindestens 2000 ms Spinner-Anzeigezeit
+
+                    // Setze die Skalierung des Modells
+                    // entity.setAttribute('scale', {x: scale, y: scale, z: scale}); //
 
                     // Warte die verbleibende Zeit, wenn die Mindestanzeigezeit noch nicht erreicht ist
-                    if (remainingTime > 0) {
+                    if (remainingTime > 0 && isButtonClicked) {
                         setTimeout(function() {
                             document.getElementById('spinner').style.display = 'none';
                             entity.object3D.visible = true;
+                            isButtonClicked = false;
+                            randomizeButton.style.opacity = '1';
                         }, remainingTime);
                     } else {
                         // Verstecke den Spinner sofort, wenn die Mindestanzeigezeit erreicht ist
                         document.getElementById('spinner').style.display = 'none';
                         entity.object3D.visible = true;
+                        isButtonClicked = false;
+                        randomizeButton.style.opacity = '1';
                     }
                 });
 
                 // Event-Listener für das Laden aller Assets
                 assets.addEventListener('loaded', function () {
                     // Ändere das Modell zufällig beim Laden der Seite
+                    isButtonClicked = false;
                     randomizeModel();
                 });
 
                 // Ändere das Modell zufällig beim Klicken auf den Button
-                randomizeButton.addEventListener('click', randomizeModel);
+                randomizeButton.addEventListener('click', function() {
+                    isButtonClicked = true;
+                    randomizeModel();
+                });
+
+                // Info Popup öffnen
+                window.openInfoPopup = function(event) {
+                    event.stopPropagation();
+                    document.getElementById('infoPopup').style.display = 'flex';
+                };
+
+                // Info Popup schließen
+                window.closeInfoPopup = function() {
+                    document.getElementById('infoPopup').style.display = 'none';
+                }
+                
+                // Event-Listener für das Klicken außerhalb des Info Popups
+                document.body.onclick = function(event) {
+                    var infoPopup = document.getElementById('infoPopup');
+
+                    // Überprüfen, ob das geklickte Element das Popup-Fenster ist oder ein Kind davon
+                    var isClickInside = infoPopup.contains(event.target);
+
+                    if (!isClickInside && infoPopup.style.display === 'flex') {
+                        closeInfoPopup();
+                    }
+                };
             });
         </script>
     </body>

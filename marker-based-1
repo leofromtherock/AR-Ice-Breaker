@@ -307,6 +307,7 @@
         <script>
             // Warten, bis das Dokument vollständig geladen ist
             document.addEventListener('DOMContentLoaded', function () {
+                try {
                 // Referenzen auf HTML-Elemente und Initialisierung von Variablen
                 var assets = document.querySelector('a-assets');
                 var randomizeButton = document.querySelector('.randomize-object-button');
@@ -318,7 +319,6 @@
                 var isMarkerVisible = false; // Marker-Sichtbarkeitsstatus
 
                 // Deaktiviere den Button zunächst
-                var randomizeButton = document.querySelector('.randomize-object-button');
                 randomizeButton.style.display = 'none';
                 
                 // Event-Listener für das "markerFound"-Event
@@ -462,6 +462,9 @@
                         closeInfoPopup();
                     }
                 };
+                } catch (error) {
+                    console.error(error);
+                }
             });
         </script>
     </body>

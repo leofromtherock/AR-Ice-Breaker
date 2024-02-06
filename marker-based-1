@@ -22,18 +22,6 @@
 
             <!-- Assets für die Szene (3D-Modelle) -->
             <a-assets>
-                <a-asset-item id="object-1" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/1/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-2" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/2/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-3" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/3/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-4" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/4/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-5" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/5/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-6" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/6/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-7" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/7/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-8" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/8/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-9" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/9/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-10" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/10/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-11" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/11/scene.gltf"></a-asset-item>
-                <a-asset-item id="object-12" src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/12/scene.gltf"></a-asset-item>
             </a-assets>
 
             <!-- Marker, der das 3D-Modell anzeigt -->
@@ -309,14 +297,15 @@
             document.addEventListener('DOMContentLoaded', function () {
                 try {
                 // Referenzen auf HTML-Elemente und Initialisierung von Variablen
-                var assets = document.querySelector('a-assets');
-                var randomizeButton = document.querySelector('.randomize-object-button');
-                var entity = document.querySelector('a-entity');
-                var models = ['object-1', 'object-2', 'object-3', 'object-4', 'object-5', 'object-6', 
+                const assets = document.querySelector('a-assets');
+                const randomizeButton = document.querySelector('.randomize-object-button');
+                let entity = document.querySelector('a-entity');
+                const models = ['object-1', 'object-2', 'object-3', 'object-4', 'object-5', 'object-6', 
                             'object-7', 'object-8', 'object-9', 'object-10', 'object-11', 'object-12']; // Liste der Modelle
-                var startTime = Date.now(); // Startzeit für die Anzeige des Spinners
-                var sceneEl = document.querySelector('#scene'); // Szene-Element
-                var isMarkerVisible = false; // Marker-Sichtbarkeitsstatus
+                let startTime = Date.now(); // Startzeit für die Anzeige des Spinners
+                const sceneEl = document.querySelector('#scene'); // Szene-Element
+                let isMarkerVisible = false; // Marker-Sichtbarkeitsstatus
+                let currentModel = ''; // Aktuelles Modell
 
                 // Deaktiviere den Button zunächst
                 randomizeButton.style.display = 'none';
@@ -350,9 +339,9 @@
                 });
 
                 // Initialisierung von Skalierungs- und Rotationsfaktoren für die Gestensteuerung
-                var scaleFactor = 1;
-                var initialScale = {x: 1, y: 1, z: 1}; 
-                var rotationFactor = 0.1; 
+                let scaleFactor = 1;
+                let initialScale = {x: 1, y: 1, z: 1}; 
+                const rotationFactor = 0.1; 
 
                 // Event-Listener für Gesten-Events
                 sceneEl.addEventListener("onefingermove", handleRotation);
@@ -370,8 +359,8 @@
                 function handleScale(event) {
                     if (isMarkerVisible) {
                         scaleFactor *= 1 + event.detail.spreadChange / event.detail.startSpread;
-                        var minScale = entity.getAttribute('gesture-handler').minScale;
-                        var maxScale = entity.getAttribute('gesture-handler').maxScale;
+                        const minScale = entity.getAttribute('gesture-handler').minScale;
+                        const maxScale = entity.getAttribute('gesture-handler').maxScale;
                         scaleFactor = Math.min(Math.max(scaleFactor, minScale), maxScale);
                         entity.object3D.scale.x = scaleFactor * initialScale.x;
                         entity.object3D.scale.y = scaleFactor * initialScale.y;
@@ -379,36 +368,66 @@
                     }
                 }
 
+                let currentModelElement = null;
+
+                // Funktion zum Laden eines Modells
+                function loadModel(modelId, modelUrl) {
+                    const assets = document.querySelector('a-assets');
+                    const modelItem = document.createElement('a-asset-item');
+                    modelItem.setAttribute('id', modelId);
+                    modelItem.setAttribute('src', modelUrl);
+                    assets.appendChild(modelItem);
+
+                    // Speichern Sie eine Referenz auf das Element
+                    currentModelElement = modelItem;
+                }
+
+                // Funktion zum Zufälligen Auswählen eines Modells
+                function getRandomModelUrl() {
+                    const randomIndex = Math.floor(Math.random() * models.length);
+                    const randomModel = models[randomIndex];
+                    return {
+                        model: randomModel,
+                        url: `https://keb-rheinland-pfalz.de/wp-content/uploads/AR-tests/assets/${randomModel}/scene.gltf`
+                    };
+                }
+
+                // Funktion zum Entfernen des aktuellen Modells
+                function removeCurrentModel() {
+                    if (currentModelElement) {
+                        currentModelElement.parentNode.removeChild(currentModelElement);
+                        currentModelElement = null;
+                    }
+                }
+
+                // Registrieren Sie den EventListener außerhalb der randomizeModel Funktion
+                entity.addEventListener('model-loaded', removeCurrentModel);
+
                 // Funktion zum Zufälligen Ändern des Modells
                 function randomizeModel() {
-                    var currentModel = entity.getAttribute('gltf-model');
-                    var randomModel, modelUrl;
+                    let modelData = getRandomModelUrl();
+                    while (modelData.url === currentModel) {
+                        modelData = getRandomModelUrl();
+                    }
 
-                    // Verstecke das Modell und den Button und zeige den Spinner
+                    loadModel(modelData.model, modelData.url);
+
                     entity.object3D.visible = false;
                     document.getElementById('spinner').style.display = 'block';
                     randomizeButton.style.opacity = '0';
 
-                    // Wähle ein zufälliges Modell, das nicht das aktuelle Modell ist
-                    do {
-                        randomModel = models[Math.floor(Math.random() * models.length)];
-                        modelUrl = document.querySelector('#' + randomModel).getAttribute('src');
-                    } while (modelUrl === currentModel);
-
-                    // Setze die Startzeit und ändere das Modell
                     startTime = Date.now();
-                    entity.setAttribute('gltf-model', modelUrl);
+                    entity.setAttribute('gltf-model', `#${modelData.model}`);
+
+                    currentModel = modelData.model;
                 }
 
-                var isButtonClicked = false;
+                let isButtonClicked = false;
 
-                // Event-Listener für das Laden des Modells
-                entity.addEventListener('model-loaded', function () {
-                    var elapsedTime = Date.now() - startTime;
-                    var remainingTime = Math.max(0, 2000 - elapsedTime); // Mindestens 2000 ms Spinner-Anzeigezeit
-
-                    // Setze die Skalierung des Modells
-                    // entity.setAttribute('scale', {x: scale, y: scale, z: scale}); //
+                // Funktion zum Handhaben des Modell-Ladevorgangs
+                function handleModelLoaded() {
+                    const elapsedTime = Date.now() - startTime;
+                    const remainingTime = Math.max(0, 2000 - elapsedTime); // Mindestens 2000 ms Spinner-Anzeigezeit
 
                     // Warte die verbleibende Zeit, wenn die Mindestanzeigezeit noch nicht erreicht ist
                     if (remainingTime > 0 && isButtonClicked) {
@@ -425,7 +444,7 @@
                         isButtonClicked = false;
                         randomizeButton.style.opacity = '1';
                     }
-                });
+                }
 
                 // Event-Listener für das Laden aller Assets
                 assets.addEventListener('loaded', function () {
@@ -453,10 +472,10 @@
                 
                 // Event-Listener für das Klicken außerhalb des Info Popups
                 document.body.onclick = function(event) {
-                    var infoPopup = document.getElementById('infoPopup');
+                    const infoPopup = document.getElementById('infoPopup');
 
                     // Überprüfen, ob das geklickte Element das Popup-Fenster ist oder ein Kind davon
-                    var isClickInside = infoPopup.contains(event.target);
+                    const isClickInside = infoPopup.contains(event.target);
 
                     if (!isClickInside && infoPopup.style.display === 'flex') {
                         closeInfoPopup();

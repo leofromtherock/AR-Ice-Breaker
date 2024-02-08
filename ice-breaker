@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <!-- Meta-Tags für Zeichensatz und Ansichtsfenster -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <!-- Einbindung der benötigten JavaScript-Bibliotheken -->
+        <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+        <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+        <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+        <script src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/components/model-component.js"></script>
+        <script src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/components/marker-component.js"></script>
+        <script src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/components/gesture-component.js"></script>
+        <script src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/components/spinner-component.js"></script>
+        <script src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/components/ui-component.js"></script>
+        <script src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/components/popup-component.js"></script>
+    </head>
+
+    <body style="margin: 0px; overflow: hidden;">
+        <!-- AR-Szene mit verschiedenen Einstellungen und Gestenerkennung -->
+        <a-scene 
+            embedded 
+            arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+            renderer="logarithmicDepthBuffer: true;"
+            xr-mode-ui="enabled: false"
+            gesture-detector
+            id="scene">
+
+            <!-- Assets für die Szene (3D-Modelle) -->
+            <a-assets>
+            </a-assets>
+
+            <!-- Marker, der das 3D-Modell anzeigt -->
+            <a-marker id="random-object" type="barcode" value="1" smooth="true" emitevents="true">
+                <a-entity
+                model-manager="models: object-1, object-2, object-3, object-4, object-5, object-6, object-7, object-8, object-9, object-10, object-11, object-12, object-13, object-14, object-15, object-16, object-17, object-18, object-19, object-20, object-21, object-22, object-23, object-24, object-25, object-26, object-27, object-28, object-29"
+                position="0 0 0"
+                class="clickable"
+                gesture-handler="minScale: 0.25; maxScale: 10"
+                gesture-control
+                info-popup
+                marker-detection
+                ui-interaction
+                loading-spinner>
+                </a-entity>
+            </a-marker>
+            
+            <!-- Kamera-Entity -->
+            <a-entity camera></a-entity>
+        </a-scene>
+        
+        <!-- UI-Elemente -->
+        <div class="ui-frame"></div>
+
+        <!-- Info-Button und Popup -->
+        <div class="info"></div>
+
+        <div class="info-popup" id="infoPopup">
+            <div style="padding-top: 10px;">
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/qr_code.png">
+                <div>
+                    <h1>Code scannen</h1>
+                    <p>Den QR Code (erneut) scannen, um die AR-Inhalte zu entdecken.</p>
+                </div>
+            </div>
+            <div>
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/one_finger.png">
+                <div>
+                    <h1>Drehen</h1>
+                    <p>Mit einem Finger kann das Modell in alle Richtungen gedreht werden.</p>
+                </div>
+            </div>
+            <div>
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/two_fingers.png">
+                <div>
+                    <h1>Skalieren</h1>
+                    <p>Mit zwei Fingern kann das Modell größer oder kleiner gezogen werden.</p>
+                </div>
+            </div>
+            <div>
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/reload.png">
+                <div>
+                    <h1>Modell wechseln</h1>
+                    <p>Mit dem Reload-Button kann ein zufällig neues Modell angezeigt werden.</p>
+                </div>
+            </div>
+            <div class="close-icon">&#x2715;</div>
+        </div>
+
+        <!-- Nachricht, die angezeigt wird, wenn der Marker nicht sichtbar ist -->
+        <p class="marker-lost-message">Bitte Marker scannen</p> 
+
+        <div class="button">
+            <!-- Button zum Zufälligen Ändern des 3D-Modells -->
+            <button class="randomize-object-button"></button>
+            <!-- <button class="screenshot-button">Foto</button> -->
+        </div>
+        <!-- Spinner für Ladeanzeige -->
+        <div id="spinner" class="spinner"></div>
+
+        <style>
+            /* Rahmen für die Benutzeroberfläche, zentriert und nimmt den gesamten Bildschirm ein */
+            .ui-frame {
+                pointer-events: none;
+                height: -webkit-fill-available;
+                width: -webkit-fill-available;
+                border: 10px solid rgba(255, 255, 255, 0.15); 
+                overflow: hidden;
+                z-index: 9;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: 
+                    inset 5px 5px 5px rgba(233, 114, 76, 0.5),
+                    inset -5px -5px 5px rgba(224, 190, 54, 0.5),
+                    inset 0 0 10px rgba(255, 255, 255, 0.75);
+            }
+
+            @supports not (height: -webkit-fill-available) {
+                .ui-frame {
+                    height: 100vh;
+                    width: 100vw;
+                }
+            }
+
+            /* Info-Button und Pop-Up */
+            .info {
+                position: absolute;
+                content: '';
+                top: 20px;
+                left: 20px;
+                font-family: 'Gill Sans', sans-serif;
+                text-align: center;
+                align-items: center;
+                font-weight: bold;
+                color: #E9724C;
+                border: 3px solid #E9724C;
+                border-radius: 50%;
+                width: 20px; 
+                height: 20px; 
+                line-height: 20px; 
+                cursor: pointer;
+                font-size: 15px;
+                z-index: 10;
+                transition: all 0.5s ease;
+            }
+
+            .info::after {
+                content: 'i'; 
+            }
+
+            .info-expanded {
+                background-color:#E9724C; 
+                color: #E0BE36; 
+                border-radius: 50px; 
+                padding: 0px 15px; 
+                width: auto; 
+                content: 'info'; 
+                transition: all 0.5s ease; 
+            }
+
+            .info-expanded::after {
+                content: 'info';
+            }
+
+            .info-popup {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 75vw;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 15;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+            }
+            
+            .info-popup img {
+                width: 75px;
+                height: 75px;
+            }
+
+            .info-popup h1 {
+                font-family: 'Gill Sans', sans-serif;
+                color: #E9724C; 
+                font-weight: bold;
+                font-size: 15px;
+            }
+
+            .info-popup p {
+                font-family: 'Gill Sans', sans-serif;
+                color: #000000; 
+                font-weight: normal;
+                font-size: 15px;
+            }
+
+            .info-popup > div {
+                display: flex;
+                align-items: center;
+            }
+
+            .info-popup > div > img {
+                margin-right: 10px;
+            }
+
+            .close-icon {
+                position: absolute;
+                top: 7px;
+                right: 7px;
+                color: black;
+                text-align: center;
+                line-height: 0.8;
+                cursor: pointer;
+                font-size: 15px;
+            }
+
+            /* Nachricht, die angezeigt wird, wenn der Marker nicht sichtbar ist */
+            .marker-lost-message {
+                pointer-events: none;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                font-family: 'Gill Sans', sans-serif;
+                text-align: center;
+                font-size: 2em;
+                color: rgba(233, 114, 76);
+                text-shadow: 0 0 10px rgba(224, 190, 54, 0.5);
+                z-index: 10;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+            }
+
+            /* Container für den Button, am unteren Rand des Bildschirms positioniert */
+            .button {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 10em; 
+                display: flex;
+                flex-direction: column; 
+                justify-content: center;
+                align-items: center;
+                z-index: 14;
+            }
+
+            /* Button zum Zufälligen Ändern des 3D-Modells */
+            .randomize-object-button {
+                position: relative;
+                justify-content: center;
+                align-items: center;
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                background: rgba(224, 190, 54, 0.25) url('https://keb-rheinland-pfalz.de/wp-content/uploads/AR/reload_2.png') no-repeat center center;
+                background-size: 60%;
+                backdrop-filter: blur(10.2px);
+                -webkit-backdrop-filter: blur(10.2px);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 
+                    0 0 10px rgba(255, 255, 255, 0.75), 
+                    -10px 0 20px rgba(233, 114, 76, 0.75), 
+                    10px 0 20px rgba(224, 190, 54, 0.75);  
+                margin-bottom: 40px;
+                transition: opacity 0.5s ease-in-out;
+                opacity: 0;
+            }
+
+            /* Loading Spinner und Animation */
+            .spinner {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+                z-index: 20; 
+                display: none; 
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                animation: pulse 1s infinite alternate;
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(0.25);
+                    background-color: #E0BE36;
+                }
+                100% {
+                    transform: scale(2);
+                    background-color: rgba(233, 114, 76, 0.5);
+                    backdrop-filter: blur(10.2px);
+                    -webkit-backdrop-filter: blur(10.2px);
+                    border: 0.5px solid rgba(255, 255, 255, 0.15);
+                    box-shadow: 
+                        0 0 10px rgba(255, 255, 255, 0.75), 
+                        -10px 0 20px rgba(233, 114, 76, 0.75), 
+                        10px 0 20px rgba(224, 190, 54, 0.75);
+                }
+            }
+        </style>
+    </body>
+</html>

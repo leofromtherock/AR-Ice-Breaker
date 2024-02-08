@@ -1,8 +1,0 @@
-Model Information:
-* title:	Zefir Camera with Emitar lens
-* source:	https://sketchfab.com/3d-models/zefir-camera-with-emitar-lens-fa81f9275f544ad28cbf27fc256ce62e
-* author:	Virtual Museums of Małopolska (https://sketchfab.com/WirtualneMuzeaMalopolski)
-
-Model License:
-* license type:	CC0-1.0 (http://creativecommons.org/publicdomain/zero/1.0/)
-* requirements:	Credit is not mandatory. Commercial use is allowed.

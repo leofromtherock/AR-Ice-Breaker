@@ -57,28 +57,28 @@
 
         <div class="info-popup" id="infoPopup">
             <div style="padding-top: 10px;">
-                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/qr_code.png">
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/UI/qr_code.png">
                 <div>
                     <h1>Code scannen</h1>
                     <p>Den QR Code (erneut) scannen, um die AR-Inhalte zu entdecken.</p>
                 </div>
             </div>
             <div>
-                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/one_finger.png">
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/UI/one_finger.png">
                 <div>
                     <h1>Drehen</h1>
                     <p>Mit einem Finger kann das Modell in alle Richtungen gedreht werden.</p>
                 </div>
             </div>
             <div>
-                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/two_fingers.png">
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/UI/two_fingers.png">
                 <div>
                     <h1>Skalieren</h1>
                     <p>Mit zwei Fingern kann das Modell größer oder kleiner gezogen werden.</p>
                 </div>
             </div>
             <div>
-                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/reload.png">
+                <img src="https://keb-rheinland-pfalz.de/wp-content/uploads/AR/UI/reload.png">
                 <div>
                     <h1>Modell wechseln</h1>
                     <p>Mit dem Reload-Button kann ein zufällig neues Modell angezeigt werden.</p>
@@ -259,7 +259,7 @@
                 width: 100px;
                 height: 100px;
                 border-radius: 50%;
-                background: rgba(224, 190, 54, 0.25) url('https://keb-rheinland-pfalz.de/wp-content/uploads/AR/reload_2.png') no-repeat center center;
+                background: rgba(224, 190, 54, 0.25) url('https://keb-rheinland-pfalz.de/wp-content/uploads/AR/UI/reload_2.png') no-repeat center center;
                 background-size: 60%;
                 backdrop-filter: blur(10.2px);
                 -webkit-backdrop-filter: blur(10.2px);

@@ -102,8 +102,6 @@
             /* Rahmen für die Benutzeroberfläche, zentriert und nimmt den gesamten Bildschirm ein */
             .ui-frame {
                 pointer-events: none;
-                height: -webkit-fill-available;
-                width: -webkit-fill-available;
                 border: 10px solid rgba(255, 255, 255, 0.15); 
                 overflow: hidden;
                 z-index: 9;
@@ -115,13 +113,6 @@
                     inset 5px 5px 5px rgba(233, 114, 76, 0.5),
                     inset -5px -5px 5px rgba(224, 190, 54, 0.5),
                     inset 0 0 10px rgba(255, 255, 255, 0.75);
-            }
-
-            @supports not (height: -webkit-fill-available) {
-                .ui-frame {
-                    height: 100vh;
-                    width: 100vw;
-                }
             }
 
             /* Info-Button und Pop-Up */
@@ -307,5 +298,17 @@
                 }
             }
         </style>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Berechnen Sie die Höhe und Breite des Viewports
+                var viewportHeight = window.innerHeight;
+                var viewportWidth = window.innerWidth;
+
+                // Wenden Sie die Höhe und Breite des Viewports auf .ui-frame an
+                var uiFrame = document.querySelector('.ui-frame');
+                uiFrame.style.height = `calc(${viewportHeight}px - 20px)`;
+                uiFrame.style.width = `calc(${viewportWidth}px - 20px)`;
+            });
+        </script>
     </body>
 </html>
